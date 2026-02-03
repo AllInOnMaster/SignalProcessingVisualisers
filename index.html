@@ -1,178 +1,176 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Signal Processing Visualizer</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-/* ===== Scrollbar (Purple) ===== */
 ::-webkit-scrollbar{width:10px}
 ::-webkit-scrollbar-track{background:#120a24}
-::-webkit-scrollbar-thumb{
-  background:linear-gradient(180deg,#8b5cf6,#ec4899);
-  border-radius:10px
-}
-::-webkit-scrollbar-thumb:hover{
-  background:linear-gradient(180deg,#a78bfa,#f472b6)
-}
-
+::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#8b5cf6,#ec4899);border-radius:10px}
 :root{
- --bg1:#0f0718; --bg2:#1b0f2e; --p:#8b5cf6; --a:#ec4899; --t:#f5f3ff; --m:#c4b5fd;
- --glass:rgba(255,255,255,.08)
+ --bg1:#0b0615;--bg2:#1b0f2e;
+ --p:#8b5cf6;--a:#ec4899;
+ --t:#f5f3ff;--m:#c4b5fd;
+ --glass:rgba(255,255,255,.08);
+ --plot:#0a0714;--grid:rgba(255,255,255,.12);
 }
 *{box-sizing:border-box;font-family:Poppins,sans-serif}
-body{margin:0;color:var(--t);background:radial-gradient(circle at top,var(--bg2),var(--bg1));}
-header{position:sticky;top:0;z-index:5;display:flex;justify-content:space-between;align-items:center;
- padding:14px 28px;background:linear-gradient(90deg,rgba(139,92,246,.18),rgba(236,72,153,.18));
- backdrop-filter:blur(12px)}
-nav a{color:var(--m);margin-left:16px;text-decoration:none;cursor:pointer}
-.glow{position:fixed;width:420px;height:420px;filter:blur(90px);
- background:radial-gradient(circle,rgba(139,92,246,.45),transparent 70%);z-index:-1}
+body{margin:0;color:var(--t);background:radial-gradient(circle at top,var(--bg2),var(--bg1))}
+header{position:sticky;top:0;z-index:10;display:flex;justify-content:space-between;align-items:center;padding:14px 28px;background:linear-gradient(90deg,rgba(139,92,246,.18),rgba(236,72,153,.18));backdrop-filter:blur(12px)}
+nav a{color:var(--m);margin-left:18px;text-decoration:none;cursor:pointer}
 .hero{min-height:90vh;display:grid;place-items:center;text-align:center}
-.hero h1{font-size:3.6rem;background:linear-gradient(90deg,var(--p),var(--a));
- -webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.btn{padding:14px 28px;border-radius:40px;border:none;color:#fff;cursor:pointer;
- background:linear-gradient(90deg,var(--p),var(--a));box-shadow:0 0 30px rgba(139,92,246,.35)}
+.hero h1{font-size:3.6rem;background:linear-gradient(90deg,var(--p),var(--a));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.btn{padding:14px 30px;border-radius:40px;border:none;color:#fff;cursor:pointer;background:linear-gradient(90deg,var(--p),var(--a))}
 .hidden{display:none}
-.card{background:var(--glass);border:1px solid rgba(255,255,255,.12);
- border-radius:22px;backdrop-filter:blur(14px)}
-.wrap{max-width:1200px;margin:40px auto;padding:28px}
-.controls{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:22px}
-.dark{background:#120a24;color:var(--t);border:1px solid rgba(139,92,246,.45);border-radius:22px;padding:10px 14px}
-.field{display:flex;flex-direction:column;align-items:flex-start}
-.field label{font-size:.8rem;color:var(--m);margin-left:6px;margin-bottom:2px}
-.band{display:flex;gap:12px}
-.band label{font-size:.8rem;color:var(--m)}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
-.box{background:rgba(15,7,24,.85);border-radius:18px;padding:14px}
-canvas{width:100%;height:280px;background:#090314;border-radius:12px}
-.team p{color:var(--m);margin:.5rem 0}
-footer{color:var(--m);text-align:center;padding:24px}
+.wrap{max-width:1350px;margin:40px auto;padding:20px}
+.card{background:var(--glass);border-radius:22px;backdrop-filter:blur(14px);padding:22px}
+.controls{display:flex;flex-wrap:wrap;gap:16px;justify-content:center;margin-bottom:30px}
+.dark{background:#120a24;color:var(--t);border:1px solid rgba(139,92,246,.45);border-radius:18px;padding:10px 14px}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:.8rem;color:var(--m)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+.plot-card{background:linear-gradient(180deg,rgba(255,255,255,.1),rgba(255,255,255,.03));border-radius:20px;padding:16px}
+.plot-header{font-weight:600;color:var(--m);border-bottom:1px solid rgba(255,255,255,.2);padding-bottom:8px;margin-bottom:10px}
+.plot-inner{background:var(--plot);border-radius:12px;padding:6px}
+canvas{width:100%;height:280px}
+footer{text-align:center;color:var(--m);padding:24px}
 </style>
 </head>
 <body>
-<div class="glow" id="glow"></div>
 <header>
- <h2>Signal Visualizer</h2>
- <nav>
-  <a onclick="show('home')">Home</a>
-  <a onclick="show('project')">Project</a>
-  <a onclick="show('team')">Team</a>
- </nav>
+<h2>Signal Visualizer</h2>
+<nav>
+<a onclick="show('home')">Home</a>
+<a onclick="show('project')">Project</a>
+<a onclick="show('team')">Team</a>
+</nav>
 </header>
 
 <section id="home" class="hero">
- <div>
-  <h1>Signal Processing Visualizer</h1>
-  <p style="color:var(--m);max-width:860px;margin:12px auto">
-   Generate signals, apply filters, and analyze time & frequency domains.
-  </p>
-  <button class="btn" onclick="show('project')">View Project</button>
- </div>
+<div>
+<h1>Signal Processing Visualizer</h1>
+<p style="color:var(--m)">High-clarity time & frequency domain analysis with noise and filtering</p>
+<button class="btn" onclick="show('project')">View Project</button>
+</div>
 </section>
 
 <section id="project" class="hidden">
- <div class="wrap card">
-  <h3>Signal Analysis Workspace</h3>
-  <div class="controls">
-   <select id="sig" class="dark">
-    <option>sine</option><option>square</option><option>triangle</option>
-   </select>
+<div class="wrap card">
+<h3>Signal Analysis Workspace</h3>
+<div class="controls">
+<select id="sig" class="dark"><option>sine</option><option>square</option><option>triangle</option></select>
+<select id="filt" class="dark"><option value="none">No Filter</option><option value="lp">Low Pass</option><option value="hp">High Pass</option><option value="bp">Band Pass</option></select>
+<div class="field"><label>Frequency (Hz)</label><input id="freq" class="dark" value="5"></div>
+<div class="field"><label>Noise Level</label><input id="noise" type="range" min="0" max="1" step="0.05" value="0"></div>
+<div id="band" class="controls hidden">
+<div class="field"><label>Low Cut (Hz)</label><input id="lo" class="dark" value="3"></div>
+<div class="field"><label>High Cut (Hz)</label><input id="hi" class="dark" value="15"></div>
+</div>
+<button class="btn" onclick="run()">Run</button>
+</div>
 
-   <select id="filt" class="dark">
-    <option value="none">No Filter</option>
-    <option value="lp">Low Pass</option>
-    <option value="hp">High Pass</option>
-    <option value="bp">Band Pass</option>
-   </select>
-
-   <div class="field">
-     <label>Frequency (Hz)</label>
-     <input id="freq" class="dark" type="number" value="5" min="1">
-   </div>
-
-   <div id="band" class="band hidden">
-    <div class="field">
-      <label>Low Cut (Hz)</label>
-      <input id="lo" class="dark" type="number" value="3">
-    </div>
-    <div class="field">
-      <label>High Cut (Hz)</label>
-      <input id="hi" class="dark" type="number" value="15">
-    </div>
-   </div>
-
-   <button class="btn" onclick="run()">Run</button>
-  </div>
-
-  <div class="grid">
-   <div class="box"><h4>Original (Time)</h4><canvas id="t0"></canvas></div>
-   <div class="box"><h4>Filtered (Time)</h4><canvas id="t1"></canvas></div>
-   <div class="box"><h4>Original (FFT)</h4><canvas id="f0"></canvas></div>
-   <div class="box"><h4>Filtered (FFT)</h4><canvas id="f1"></canvas></div>
-  </div>
- </div>
+<div class="grid">
+<div class="plot-card"><div class="plot-header">Original Signal (Time)</div><div class="plot-inner"><canvas id="t0" width="1600" height="500"></canvas></div></div>
+<div class="plot-card"><div class="plot-header">Original Spectrum (FFT)</div><div class="plot-inner"><canvas id="f0" width="1600" height="500"></canvas></div></div>
+<div class="plot-card"><div class="plot-header">Filtered Signal (Time)</div><div class="plot-inner"><canvas id="t1" width="1600" height="500"></canvas></div></div>
+<div class="plot-card"><div class="plot-header">Filtered Spectrum (FFT)</div><div class="plot-inner"><canvas id="f1" width="1600" height="500"></canvas></div></div>
+</div>
+</div>
 </section>
 
 <section id="team" class="hidden">
- <div class="wrap card team">
-  <h3>Project Team</h3>
-  <p>Satyajeet Sachin Pawar (25BCE1238)</p>
-  <p>Pranit Nitin Bhosale (25BCE1236)</p>
-  <p>Vidyut Ganesh Subramanian (25BCE1234)</p>
-  <p>Sharvesh B (25BEC1279)</p>
-  <p>Surya H (25BMV1058)</p>
- </div>
+<div class="wrap card">
+<h3>Project Team</h3>
+<p>Satyajeet Sachin Pawar</p><p>Pranit Nitin Bhosale</p><p>Vidyut Ganesh Subramanian</p><p>Sharvesh B</p><p>Surya H</p>
+</div>
 </section>
 
 <footer>© 2026 Signal Processing Visualizer</footer>
 
 <script>
-const glow=document.getElementById('glow');
-addEventListener('mousemove',e=>{glow.style.left=e.clientX-210+'px';glow.style.top=e.clientY-210+'px';});
+function show(id){['home','project','team'].forEach(s=>document.getElementById(s).classList.add('hidden'));document.getElementById(id).classList.remove('hidden')}
+filt.onchange=()=>band.classList.toggle('hidden',filt.value!=='bp');
 
-function show(id){['home','project','team'].forEach(s=>document.getElementById(s).classList.add('hidden'));
- document.getElementById(id).classList.remove('hidden');}
-
-document.getElementById('filt').onchange=()=>{
- document.getElementById('band').classList.toggle('hidden',document.getElementById('filt').value!=='bp');
+function grid(c){
+ let W=c.canvas.width,H=c.canvas.height;
+ c.strokeStyle='rgba(255,255,255,.12)';c.lineWidth=1;
+ for(let i=1;i<6;i++){
+  c.beginPath();c.moveTo(0,H*i/6);c.lineTo(W,H*i/6);c.stroke();
+  c.beginPath();c.moveTo(W*i/6,0);c.lineTo(W*i/6,H);c.stroke();
+ }
+ c.strokeStyle='rgba(255,255,255,.25)';
+ c.beginPath();c.moveTo(0,H/2);c.lineTo(W,H/2);c.stroke();
 }
 
-function gen(sig,f,fs=1000){
- const x=[]; for(let i=0;i<fs;i++){const t=i/fs;
-  if(sig==='sine') x.push(Math.sin(2*Math.PI*f*t));
-  else if(sig==='square') x.push(Math.sign(Math.sin(2*Math.PI*f*t)));
-  else x.push(2*Math.abs(2*(t*f-Math.floor(.5+t*f)))-1);
- } return x;
+function gen(s,f,n,fs=1500){
+ let x=[];
+ for(let i=0;i<fs;i++){
+  let t=i/fs,v=0;
+  if(s==='sine')v=Math.sin(2*Math.PI*f*t);
+  else if(s==='square')v=Math.sign(Math.sin(2*Math.PI*f*t));
+  else v=2*Math.abs(2*(t*f-Math.floor(.5+t*f)))-1;
+  v+=n*(Math.random()*2-1);
+  x.push(v);
+ }
+ return x;
 }
-function lp(x){const y=[]; for(let i=0;i<x.length;i++) y.push(i?0.8*y[i-1]+0.2*x[i]:x[i]); return y;}
-function hp(x){const y=[]; for(let i=0;i<x.length;i++) y.push(i?x[i]-x[i-1]:0); return y;}
+function lp(x){return x.map((v,i)=>i?0.9*x[i-1]+0.1*v:v)}
+function hp(x){return x.map((v,i)=>i?v-x[i-1]:0)}
 function fft(x){
- const N=x.length, m=[]; for(let k=0;k<N/2;k++){let re=0,im=0;
-  for(let n=0;n<N;n++){re+=x[n]*Math.cos(2*Math.PI*k*n/N); im-=x[n]*Math.sin(2*Math.PI*k*n/N);}
-  m.push(Math.sqrt(re*re+im*im)/N);
- } return m;
+ let N=x.length,m=[];
+ for(let k=0;k<N/2;k++){
+  let re=0,im=0;
+  for(let n=0;n<N;n++){
+   re+=x[n]*Math.cos(2*Math.PI*k*n/N);
+   im-=x[n]*Math.sin(2*Math.PI*k*n/N);
+  }
+  m.push(Math.log10(Math.sqrt(re*re+im*im)+1));
+ }
+ return m;
 }
-function bp(x,lo,hi,fs=1000){
- const N=x.length; const re=new Array(N).fill(0), im=new Array(N).fill(0);
- for(let k=0;k<N;k++) for(let n=0;n<N;n++){re[k]+=x[n]*Math.cos(2*Math.PI*k*n/N); im[k]-=x[n]*Math.sin(2*Math.PI*k*n/N);}
- for(let k=0;k<N;k++){const f=k*fs/N; if(f<lo||f>hi){re[k]=0; im[k]=0;}}
- const y=[]; for(let n=0;n<N;n++){let s=0; for(let k=0;k<N;k++) s+=re[k]*Math.cos(2*Math.PI*k*n/N)-im[k]*Math.sin(2*Math.PI*k*n/N); y.push(s/N);}
+function bp(x,lo,hi,fs=1500){
+ let N=x.length,re=[],im=[];
+ for(let k=0;k<N;k++){
+  re[k]=0;im[k]=0;
+  for(let n=0;n<N;n++){
+   re[k]+=x[n]*Math.cos(2*Math.PI*k*n/N);
+   im[k]-=x[n]*Math.sin(2*Math.PI*k*n/N);
+  }
+  let f=k*fs/N;if(f<lo||f>hi){re[k]=0;im[k]=0}
+ }
+ let y=[];
+ for(let n=0;n<N;n++){
+  let s=0;
+  for(let k=0;k<N;k++)s+=re[k]*Math.cos(2*Math.PI*k*n/N)-im[k]*Math.sin(2*Math.PI*k*n/N);
+  y.push(s/N);
+ }
  return y;
 }
-function draw(id,data){
- const c=document.getElementById(id).getContext('2d'); const W=c.canvas.width, H=c.canvas.height;
- c.clearRect(0,0,W,H); c.strokeStyle='#8b5cf6'; c.lineWidth=1.6; c.beginPath();
- data.forEach((v,i)=>{const x=i*W/data.length, y=H/2-v*(H*0.35); i?c.lineTo(x,y):c.moveTo(x,y)});
+function draw(id,d,color){
+ let c=document.getElementById(id).getContext('2d'),W=c.canvas.width,H=c.canvas.height;
+ c.clearRect(0,0,W,H);grid(c);
+ c.strokeStyle=color;c.lineWidth=3;c.beginPath();
+ d.forEach((v,i)=>{
+  let x=i*W/d.length,y=H/2-v*(H*.35);
+  i?c.lineTo(x,y):c.moveTo(x,y)
+ });
  c.stroke();
 }
+
+['t0','t1','f0','f1'].forEach(id=>grid(document.getElementById(id).getContext('2d')));
+
 function run(){
- const s=sig.value, f=+freq.value, mode=filt.value, lo=+document.getElementById('lo').value, hi=+document.getElementById('hi').value;
- const x=gen(s,f); let y=x;
- if(mode==='lp') y=lp(x); if(mode==='hp') y=hp(x); if(mode==='bp') y=bp(x,lo,hi);
- draw('t0',x); draw('t1',y); draw('f0',fft(x)); draw('f1',fft(y));
+ let s=sig.value,f=+freq.value,n=+noise.value,loV=+lo.value,hiV=+hi.value;
+ let x=gen(s,f,n),y=x;
+ if(filt.value==='lp')y=lp(x);
+ if(filt.value==='hp')y=hp(x);
+ if(filt.value==='bp')y=bp(x,loV,hiV);
+ draw('t0',x,'#60a5fa');
+ draw('t1',y,'#34d399');
+ draw('f0',fft(x),'#f472b6');
+ draw('f1',fft(y),'#a78bfa');
 }
 </script>
 </body>
